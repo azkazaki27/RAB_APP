@@ -1,0 +1,215 @@
+{% extends "base.html" %} {% block title %} {{ rab.nama_rab }} {% endblock %}
+{% block content %}
+{% load humanize %}
+{% load static %}
+
+<body>
+    <h1 align="center">Rencana Anggaran Belanja</h1>
+    <h1 align="center">{{ rab.nama_rab }}</h1>
+    <h2 align="center">{{rab.tanggal}}</h2>
+    <form method="post" action="{% url 'detail_rab' rab.id %}" onsubmit="reloadPage()">
+        {% csrf_token %}
+        
+        <table align="center">
+            <tr bgcolor="yellow">
+                <th style="text-align:center">PEKERJAAN</th>
+                <th style="text-align:center">QTY</th>
+                <th style="text-align:center">SAT</th>
+                <th style="text-align:center">HARGA SATUAN</th>
+                <th style="text-align:center">TOTAL</th>
+                <th style="text-align:center">ACTION</th>
+            </tr>
+            <tr bgcolor="#D8D8D8">
+                <th colspan="6">Konstruksi</th>
+            </tr>
+        {% for pekerjaan in konstruksi_pekerjaan %}
+            <tr>
+            {% if form_main.instance.id == pekerjaan.id %}
+                {% include "edit_main.html" %}
+            {% else %}
+                <td colspan="1">
+                    <b>{{ pekerjaan.nama_pekerjaan }} -- {{ pekerjaan.id }}</b>
+                </td>
+                <td colspan="4"></td>
+                <td>
+                    <button type="button" onclick="showAddForm('{{ pekerjaan.id }}')">Add</button>
+                    <!-- <button formnovalidate name="edit_main" value="{{ pekerjaan.id }}">Edit</button> -->
+                    <button formnovalidate name="delete_main" value="{{ pekerjaan.id }}">Delete</button>
+                </td>
+            {% endif %}
+            </tr>
+            {% for subpekerjaan in pekerjaan.subpekerjaan_set.all %}
+            <tr>
+            {% if form.instance.id == subpekerjaan.id %}
+                {% include "edit.html" %}
+            {% else %}
+                <td>{{ subpekerjaan.nama }}</td>
+                <td style="text-align:center">{{ subpekerjaan.kuantiti }}</td>
+                <td style="text-align:center">{{ subpekerjaan.satuan }}</td>
+                <td style="text-align:right">{{ subpekerjaan.harga_satuan | intcomma }}</td>
+                <td style="text-align:right">{{ subpekerjaan.harga_total | intcomma }}</td>
+                <td>
+                    <button formnovalidate name="edit" value="{{ subpekerjaan.id }}">Edit</button>
+                    <button formnovalidate name="delete" value="{{ subpekerjaan.id }}">Delete</button>
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+            <tr id="add-form-{{ pekerjaan.id }}" style="display:none;">
+                <td colspan="6">
+                    <form method="post" action="{% url 'detail_rab' rab.id %}">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <input type="hidden" name="pekerjaan_id" value="{{ pekerjaan.id }}">
+                        <button type="submit" name="save">Save</button>
+                        <button type="button" onclick="hideAddForm('{{ pekerjaan.id }}')">Cancel</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+            <tr bgcolor="yellow">
+                <td colspan="4" style="text-align:left"><b>Total Biaya Investasi Konstruksi Include PPN</b></td>
+                <td style="text-align:right"><b>{{ total_harga_konstruksi | intcomma }}</b></td>
+                <td></td>
+            </tr>
+            <tr bgcolor="#D8D8D8">
+                <th colspan="6">Pra Konstruksi</th>
+            </tr>
+        {% for pekerjaan in pra_konstruksi_pekerjaan %}
+            <tr>
+            {% if form_main.instance.id == pekerjaan.id %}
+                {% include "edit_main.html" %}
+            {% else %}
+                <td colspan="1">
+                    <b>{{ pekerjaan.nama_pekerjaan }} -- {{ pekerjaan.id }}</b>
+                </td>
+                <td colspan="4"></td>
+                <td>
+                    <button type="button" onclick="showAddForm('{{ pekerjaan.id }}')">Add</button>
+                    <!-- <button formnovalidate name="edit_main" value="{{ pekerjaan.id }}">Edit</button> -->
+                    <button formnovalidate name="delete_main" onclick="reloadPage()" value="{{ pekerjaan.id }}">Delete</button>
+                </td>
+            {% endif %}
+            </tr>
+            {% for subpekerjaan in pekerjaan.subpekerjaan_set.all %}
+            <tr>
+            {% if form.instance.id == subpekerjaan.id %}
+                {% include "edit.html" %}
+            {% else %}
+                <td>{{ subpekerjaan.nama }}</td>
+                <td style="text-align:center">{{ subpekerjaan.kuantiti }}</td>
+                <td style="text-align:center">{{ subpekerjaan.satuan }}</td>
+                <td style="text-align:right">{{ subpekerjaan.harga_satuan | intcomma }}</td>
+                <td style="text-align:right">{{ subpekerjaan.harga_total | intcomma }}</td>
+                <td>
+                    <button formnovalidate name="edit" value="{{ subpekerjaan.id }}">Edit</button>
+                    <button formnovalidate name="delete" value="{{ subpekerjaan.id }}">Delete</button>
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+            <tr id="add-form-{{ pekerjaan.id }}" style="display:none;">
+                <td colspan="6">
+                    <form method="post" action="{% url 'detail_rab' rab.id %}">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <input type="hidden" name="pekerjaan_id" value="{{ pekerjaan.id }}">
+                        <button type="submit" name="save">Save</button>
+                        <button type="button" onclick="hideAddForm('{{ pekerjaan.id }}')">Cancel</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+            <tr bgcolor="yellow">
+                <td colspan="4" style="text-align:left"><b>Total Biaya Investasi Pra Konstruksi Include PPN</b></td>
+                <td style="text-align:right"><b>{{ total_harga_pra_konstruksi | intcomma }}</b></td>
+                <td></td>
+            </tr>
+            <tr bgcolor="yellow">
+                <td colspan="4" style="text-align:left"><b>TOTAL KONSTRUKSI</b></td>
+                <td style="text-align:right"><b>{{ total_konstruksi | intcomma }}</b></td>
+                <td></td>
+            </tr>
+        </table>
+
+        <div>
+            <h2>Approvals</h2>
+            <ul>
+                {% for approval in approvals %}
+                <li>{{ approval.approver.username }} - {{ approval.status }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <div align="center">
+            <a class="btn btn-info" href="{% url 'tambah_pekerjaan' rab.id %}">Tambah Pekerjaan</a>
+            <a class="btn btn-info" href="{% url 'pdf_view' rab.id %}" target="_blank">View PDF</a>
+            <a class="btn btn-info" href="{% url 'pdf_download' rab.id %}">Download PDF</a>
+        </div>
+        <div>
+            <img src="{% static 'contoh_stempel.png' %}" class="overlay-image">
+            <img src="{% static 'roxy.png' %}" class="overlay-image">
+        </div>
+    </form>
+</body>
+
+<style>
+    table, th, td {
+        border: 1px solid black;
+        padding-top: 5px;
+        padding-bottom: 10px;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    div {
+        padding-top: 10px;
+    }
+    body {
+        margin-bottom: 10px;
+    }
+    .overlay-image {
+        position: absolute;
+        right: 100px;
+        width: 150px;
+        height: auto;
+        z-index: 10;
+    }
+</style>
+<script>
+    function reloadPage() {
+        location.reload();
+    }
+
+    function showAddForm(pekerjaanId) {
+        document.getElementById('add-form-' + pekerjaanId).style.display = '';
+    }
+
+    function hideAddForm(pekerjaanId) {
+        document.getElementById('add-form-' + pekerjaanId).style.display = 'none';
+    }
+
+    // Function to update harga satuan when referensi harga is changed
+    function updateHargaSatuan(referensiField, hargaSatuanField) {
+        const referensiId = referensiField.value;
+        if (referensiId) {
+            fetch(`/get_referensi_harga/${referensiId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    hargaSatuanField.value = data.harga_satuan;
+                });
+        }
+    }
+
+    // Find and bind event listener to referensi harga fields
+    document.addEventListener("DOMContentLoaded", function() {
+        const referensiFields = document.querySelectorAll("[id^='id_referensi_harga']");
+        const hargaSatuanFields = document.querySelectorAll("[id^='id_harga_satuan']");
+
+        referensiFields.forEach((referensiField, index) => {
+            referensiField.addEventListener("change", function() {
+                updateHargaSatuan(referensiField, hargaSatuanFields[index]);
+            });
+        });
+    });
+</script>
+{% endblock %}

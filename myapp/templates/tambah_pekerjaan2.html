@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block title %} Tambah Pekerjaan {% endblock %}
+{% block content %}
+<head>
+    <title>Tambah Pekerjaan</title>
+    <style>
+
+        h1 {
+            text-align: center;
+        }
+
+        form {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        td script {
+            display: none;
+        }
+
+        .form-actions {
+            text-align: center;
+        }
+
+        .form-actions button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        .form-actions button[type="button"] {
+            background-color: #6c757d;
+        }
+
+        .form-actions button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tambah Pekerjaan</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form_main.as_p }}
+        {{ formset.management_form }}
+        <table id="formset-table">
+            <thead>
+                <tr>
+                    <th>Sub Pekerjaan</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for form in formset %}
+                <tr id="form-row-{{ forloop.counter0 }}">
+                    <td>
+                        {% for field in form %}
+                            {% if not field.name in 'DELETE,id,pekerjaan' %}
+                                <p>{{ field.label_tag }} {{ field }}</p>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <script type="text/javascript">
+                            (function() {
+                                const referensiField = document.getElementById("id_subpekerjaan_set-{{ forloop.counter0 }}-referensi_harga");
+                                const hargaSatuanField = document.getElementById("id_subpekerjaan_set-{{ forloop.counter0 }}-harga_satuan");
+
+                                referensiField.addEventListener("change", function() {
+                                    const referensiId = referensiField.value;
+                                    if (referensiId) {
+                                        fetch(`/get_referensi_harga/${referensiId}/`)
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                hargaSatuanField.value = data.harga_satuan;
+                                            });
+                                    }
+                                });
+                            })();
+                        </script>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="form-actions">
+            <button class="btn btn-info" type="button" onclick="addForm()">Tambah Sub Pekerjaan</button>
+            <button class="btn btn-info" type="submit">Simpan</button>
+        </div>
+    </form>
+    <script>
+        function addForm() {
+            var formCount = parseInt(document.getElementById('id_subpekerjaan_set-TOTAL_FORMS').value);
+            var formsetTable = document.getElementById('formset-table').querySelector('tbody');
+            var newForm = document.createElement('tr');
+            newForm.id = 'form-row-' + formCount;
+            var emptyFormHtml = document.getElementById('empty-form-template').innerHTML.replace(/__prefix__/g, formCount);
+            newForm.innerHTML = emptyFormHtml;
+            formsetTable.appendChild(newForm);
+            document.getElementById('id_subpekerjaan_set-TOTAL_FORMS').value = formCount + 1;
+
+            // Add event listener to the new referensi_harga field
+            const referensiField = document.getElementById("id_subpekerjaan_set-" + formCount + "-referensi_harga");
+            const hargaSatuanField = document.getElementById("id_subpekerjaan_set-" + formCount + "-harga_satuan");
+
+            referensiField.addEventListener("change", function() {
+                const referensiId = referensiField.value;
+                if (referensiId) {
+                    fetch(`/get_referensi_harga/${referensiId}/`)
+                        .then(response => response.json())
+                        .then(data => {
+                            hargaSatuanField.value = data.harga_satuan;
+                        });
+                }
+            });
+        }
+
+        // Add event listeners for initial forms
+        document.addEventListener("DOMContentLoaded", function() {
+            const formsCount = parseInt(document.getElementById('id_subpekerjaan_set-TOTAL_FORMS').value);
+            for (let i = 0; i < formsCount; i++) {
+                const referensiField = document.getElementById("id_subpekerjaan_set-" + i + "-referensi_harga");
+                const hargaSatuanField = document.getElementById("id_subpekerjaan_set-" + i + "-harga_satuan");
+
+                referensiField.addEventListener("change", function() {
+                    const referensiId = referensiField.value;
+                    if (referensiId) {
+                        fetch(`/get_referensi_harga/${referensiId}/`)
+                            .then(response => response.json())
+                            .then(data => {
+                                hargaSatuanField.value = data.harga_satuan;
+                            });
+                    }
+                });
+            }
+        });
+    </script>
+    <!-- Template for new formset form -->
+    <template id="empty-form-template">
+        {% for field in formset.empty_form %}
+            {% if not field.name in 'DELETE,id,pekerjaan' %}
+                <p>{{ field.label_tag }} {{ field }}</p>
+            {% endif %}
+        {% endfor %}
+    </template>
+</body>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %} Approvals {% endblock %}
+{% block content %}
+{% load humanize %}
+{% load static %}
+
+<body>
+    <h1 align="center">Rencana Anggaran Belanja</h1>
+    <h1 align="center">{{ rab.nama_rab }}</h1>
+    <h2 align="center">{{rab.tanggal}}</h2>
+    <h4 align="center">Dibuat oleh: {{ user_pembuat.username }}</h4>  <!-- Menampilkan user pembuat RAB -->
+
+    
+    <!-- Menampilkan tabel RAB -->
+    <table align="center">
+        <tr bgcolor="yellow">
+            <th style="text-align:center">PEKERJAAN</th>
+            <th style="text-align:center">QTY</th>
+            <th style="text-align:center">SAT</th>
+            <th style="text-align:center">HARGA SATUAN</th>
+            <th style="text-align:center">TOTAL</th>
+        </tr>
+        <tr bgcolor="#D8D8D8">
+            <th colspan="5">Konstruksi</th>
+        </tr>
+    {% for pekerjaan in konstruksi_pekerjaan %}
+        <tr>
+            <td colspan="1">
+                <b>{{ pekerjaan.nama_pekerjaan }} -- {{ pekerjaan.id }}</b>
+            </td>
+            <td colspan="4"></td>
+        </tr>
+        {% for subpekerjaan in pekerjaan.subpekerjaan_set.all %}
+        <tr>
+            <td>{{ subpekerjaan.nama }}</td>
+            <td style="text-align:center">{{ subpekerjaan.kuantiti }}</td>
+            <td style="text-align:center">{{ subpekerjaan.satuan }}</td>
+            <td style="text-align:right">{{ subpekerjaan.harga_satuan | intcomma }}</td>
+            <td style="text-align:right">{{ subpekerjaan.harga_total | intcomma }}</td>
+        </tr>
+        {% endfor %}
+    {% endfor %}
+        <tr bgcolor="yellow">
+            <td colspan="4" style="text-align:left"><b>Total Biaya Investasi Konstruksi Include PPN</b></td>
+            <td style="text-align:right"><b>{{ total_harga_konstruksi | intcomma }}</b></td>
+        </tr>
+        <tr bgcolor="#D8D8D8">
+            <th colspan="5">Pra Konstruksi</th>
+        </tr>
+    {% for pekerjaan in pra_konstruksi_pekerjaan %}
+        <tr>
+            <td colspan="1">
+                <b>{{ pekerjaan.nama_pekerjaan }} -- {{ pekerjaan.id }}</b>
+            </td>
+            <td colspan="4"></td>
+        </tr>
+        {% for subpekerjaan in pekerjaan.subpekerjaan_set.all %}
+        <tr>
+            <td>{{ subpekerjaan.nama }}</td>
+            <td style="text-align:center">{{ subpekerjaan.kuantiti }}</td>
+            <td style="text-align:center">{{ subpekerjaan.satuan }}</td>
+            <td style="text-align:right">{{ subpekerjaan.harga_satuan | intcomma }}</td>
+            <td style="text-align:right">{{ subpekerjaan.harga_total | intcomma }}</td>
+        </tr>
+        {% endfor %}
+    {% endfor %}
+        <tr bgcolor="yellow">
+            <td colspan="4" style="text-align:left"><b>Total Biaya Investasi Pra Konstruksi Include PPN</b></td>
+            <td style="text-align:right"><b>{{ total_harga_pra_konstruksi | intcomma }}</b></td>
+        </tr>
+        <tr bgcolor="yellow">
+            <td colspan="4" style="text-align:left"><b>TOTAL KONSTRUKSI</b></td>
+            <td style="text-align:right"><b>{{ total_konstruksi | intcomma }}</b></td>
+        </tr>
+    </table>
+
+    <div align="center">
+        {% if not approval_done %}
+        <form method="post">
+            {% csrf_token %}
+            <button class="btn btn-info" type="submit" name="approve">Approve</button>
+            <button class="btn btn-info" type="submit" name="reject">Reject</button>
+        </form>
+        {% endif %}
+        <a href="{% url 'approval_list' %}">Kembali ke Daftar Approval</a>
+    </div>
+</body>
+
+<style>
+    table, th, td {
+        border: 1px solid black;
+        padding-top: 5px;
+        padding-bottom: 10px;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    div {
+        padding-top: 10px;
+    }
+    body {
+        margin-bottom: 10px;
+    }
+    .btn {
+        background-color: #17a2b8;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+    .btn:hover {
+        background-color: #138496;
+    }
+</style>
+
+{% endblock %}

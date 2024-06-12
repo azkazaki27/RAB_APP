@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<body>
+    <h1>Tambah RAB</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <label for="selectApprovers">Pilih Approvers:</label>
+        <select id="selectApprovers">
+            {% for user in users %}
+                <option value="{{ user.id }}">{{ user.username }}</option>
+            {% endfor %}
+        </select>
+        <button type="button" onclick="addApprover()">Tambah Approver</button>
+
+        <ul id="approverList">
+            <!-- List of selected approvers will appear here -->
+        </ul>
+
+        <button type="submit">Simpan</button>
+    </form>
+    <a href="{% url 'home' %}">Kembali ke Home</a>
+</body>
+
+<script>
+    function addApprover() {
+        var selectApprovers = document.getElementById("selectApprovers");
+        var selectedApprover = selectApprovers.options[selectApprovers.selectedIndex];
+
+        if (!selectedApprover) {
+            return;
+        }
+
+        var approverList = document.getElementById("approverList");
+        var newApprover = document.createElement("li");
+        newApprover.textContent = selectedApprover.text;
+        newApprover.setAttribute("data-id", selectedApprover.value);
+
+        var input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "approvers";
+        input.value = selectedApprover.value;
+
+        newApprover.appendChild(input);
+        approverList.appendChild(newApprover);
+
+        // Remove selected option from the select list
+        selectApprovers.remove(selectApprovers.selectedIndex);
+    }
+</script>
+
+{% endblock %}

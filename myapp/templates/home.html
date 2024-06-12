@@ -1,0 +1,13 @@
+{% extends "base.html" %} {% block title %} Home Page {% endblock %}
+{% block content %}
+
+<h1>Daftar RAB</h1>
+<ul>
+    {% for rab in rabs %}
+        <li><a href="{% url 'detail_rab' rab.id %}">{{ rab.nama_rab }} ({{rab.tanggal}})</a></li>
+    {% endfor %}
+</ul>
+<a class="btn btn-info" href="{% url 'tambah_rab' %}">Tambah RAB</a>
+<a class="btn btn-info" href="{% url 'approval_list' %}">Approval Status</a>
+
+{% endblock %}

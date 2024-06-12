@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tambah Pekerjaan</title>
+</head>
+<body>
+    <h1>Tambah Pekerjaan</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ pekerjaan_form.as_p }}
+        {{ formset.management_form }}
+        <table>
+            {% for form in formset %}
+                {{ form.as_p }}
+            {% endfor %}
+        </table>
+        <button type="button" onclick="addForm(this)">Tambah Sub Pekerjaan</button>
+        <button type="submit">Simpan</button>
+    </form>
+    <script>
+        function addForm(button) {
+            var formCount = document.getElementById('id_subpekerjaan_set-TOTAL_FORMS').value;
+            var newForm = document.createElement('div');
+            newForm.innerHTML = document.getElementsByTagName('table')[0].innerHTML.replace(/__prefix__/g, formCount);
+            document.getElementsByTagName('table')[0].appendChild(newForm);
+            document.getElementById('id_subpekerjaan_set-TOTAL_FORMS').value = parseInt(formCount) + 1;
+        }
+    </script>
+</body>
+</html>

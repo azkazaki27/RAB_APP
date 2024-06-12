@@ -1,0 +1,12 @@
+
+{% extends "base.html" %} {% block title %} Pekerjaan Sukses {% endblock %}
+{% block content %}
+<head>
+    <title>Pekerjaan Berhasil Ditambahkan</title>
+</head>
+<body>
+    <h1>Pekerjaan Berhasil Ditambahkan</h1>
+    <a class="btn btn-info" href="{% url 'tambah_pekerjaan2' %}">Tambah pekerjaan lagi</a>
+    <a class="btn btn-info" href="{% url 'daftar_pekerjaan' %}">Lihat daftar pekerjaan</a>
+</body>
+{% endblock %}

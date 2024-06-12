@@ -1,0 +1,23 @@
+{% extends "base.html" %} 
+{% block title %} Approval List {% endblock %}
+{% block content %}
+{% load humanize %}
+{% load static %}
+
+<body>
+    <h1>Daftar RAB untuk Di-approve</h1>
+    <ul>
+        {% for rab in rabs %}
+            {% for approval in rab.approval_set.all %}
+                {% if approval.approver == user and approval.status == 'Pending' %}
+                    <li>
+                        <a href="{% url 'approve_rab' rab.id approval.id %}">{{ rab.nama_rab }} ({{ rab.tanggal }})</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    </ul>
+    <a class="btn btn-info" href="{% url 'home' %}">Kembali ke Home</a>
+</body>
+
+{% endblock %}

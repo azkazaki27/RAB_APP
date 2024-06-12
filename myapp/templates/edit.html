@@ -1,0 +1,38 @@
+<tr>
+    <td>{{ form.nama.as_widget }} -- {{ form.instance.id }} -- {{ subpekerjaan.id }}</td>
+    <td style="text-align:center">{{ form.kuantiti.as_widget }}</td>
+    <td style="text-align:center">{{ form.satuan.as_widget }}</td>
+    <td style="text-align:right">{{ form.harga_satuan.as_widget }}</td>
+    <td style="text-align:right">{{ form.harga_total.as_widget }}</td>
+    <td style="text-align:right">
+        {{ form.referensi_harga.as_widget }}
+        <script>
+            // Function to update harga satuan when referensi harga is changed
+            function updateHargaSatuan(referensiField, hargaSatuanField) {
+                const referensiId = referensiField.value;
+                if (referensiId) {
+                    fetch(`/get_referensi_harga/${referensiId}/`)
+                        .then(response => response.json())
+                        .then(data => {
+                            hargaSatuanField.value = data.harga_satuan;
+                        });
+                }
+            }
+
+            // Find and bind event listener to referensi harga fields
+            document.addEventListener("DOMContentLoaded", function() {
+                const referensiFields = document.querySelectorAll("[id^='id_referensi_harga']");
+                const hargaSatuanFields = document.querySelectorAll("[id^='id_harga_satuan']");
+
+                referensiFields.forEach((referensiField, index) => {
+                    referensiField.addEventListener("change", function() {
+                        updateHargaSatuan(referensiField, hargaSatuanFields[index]);
+                    });
+                });
+            });
+        </script>
+    </td>
+    <td>
+        <button formnovalidate name="save" value="{{ subpekerjaan.id }}">Save {{ form.instance.id }} -- {{ subpekerjaan.id }} </button>
+    </td>
+</tr>
